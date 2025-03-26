@@ -16,6 +16,8 @@ package com.evolvedbinary.tulip;
 
 import java.io.IOException;
 
+import static com.evolvedbinary.tulip.LexerConstants.BUFFER_SIZE;
+
 public class XPath10Lexer extends AbstractLexer {
 
     protected XPath10Lexer(final Source source, final int bufferSize, final XmlSpecification xmlSpecification) throws IOException {
@@ -66,10 +68,11 @@ public class XPath10Lexer extends AbstractLexer {
         // TODO(AR) set line number, column number
         try (Token token = getFreeToken()) { // doing this for not letting many token objects get created in runtime
             token.tokenType = tokenType;
-            int tokenLength = ((forward-lexemeBegin+1>0)?(forward-lexemeBegin+1):(forward-lexemeBegin+1+getBufferSize()));
-            byte[] currentToken = new byte[tokenLength];
-            populateLexeme(currentToken);
-            token.lexeme = currentToken;
+//            int tokenLength = ((forward-lexemeBegin+1>0)?(forward-lexemeBegin+1):(forward-lexemeBegin+1+getBufferSize()));
+            System.arraycopy(beginBuffer, 0, token.lexeme, 0, BUFFER_SIZE);
+            System.arraycopy(forwardBuffer, 0, token.lexeme, 0, BUFFER_SIZE);
+            token.lexemeBegin = lexemeBegin;
+            token.length = getLexemeLength();
             resetLexemeBegin();
             return token;
         } catch (Exception e) {

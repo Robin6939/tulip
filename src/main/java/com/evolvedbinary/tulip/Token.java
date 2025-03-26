@@ -14,6 +14,8 @@
  */
 package com.evolvedbinary.tulip;
 
+import static com.evolvedbinary.tulip.LexerConstants.BUFFER_SIZE;
+
 public class Token implements AutoCloseable {
 
     private final AbstractLexer lexer;
@@ -23,9 +25,12 @@ public class Token implements AutoCloseable {
     int columnNumber;
 
     byte[] lexeme;
+    int lexemeBegin;
+    int length;
 
     Token(final AbstractLexer lexer) {
         this.lexer = lexer;
+        lexeme = new byte[2*BUFFER_SIZE];
     }
 
     TokenType getTokenType() {
