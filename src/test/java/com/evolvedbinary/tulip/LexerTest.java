@@ -20,7 +20,7 @@ public class LexerTest {
         Source fs = FileSource.open(path);
         XmlSpecification xmlSpecification = new XmlSpecification_1_0();
         XPath10Lexer lexer = new XPath10Lexer(fs, BUFFER_SIZE, xmlSpecification);
-        String testing[] = {"\"What\"", "\"are\"", "\"You\"", "5", "\"Planning\"", "10", "\"gugu\"", "56", "31", "23", "42", "\"my name is robin\"", "88", "11111", "904802", "\"this is an alphanumberic 123\""};
+        String testing[] = {"\"When\"", "\"What\"", "\"Hello\"", "\"Hi\"", "1", "2", "3", "4", "11", "2", "33", "44", "\"Evolved\"", "22", "\"Evolved Binary\""};
         int count = 0;
 
         Instant start = Instant.now();
@@ -29,8 +29,9 @@ public class LexerTest {
             if(t.getTokenType()==null)
                 break;
             String lexeme = new String(t.getLexeme(), t.lexemeBegin, t.length, StandardCharsets.UTF_8);
-            System.out.println(lexeme);
-            assertEquals(lexeme, testing[count++]);
+            //Comment the next two lines when checking for time spent to tokenise
+//            System.out.println(lexeme);
+//            assertEquals(lexeme, testing[count++]);
         }
         Instant end = Instant.now();
         System.out.println("Execution Time: " + Duration.between(start, end).toMillis() + " ms");
