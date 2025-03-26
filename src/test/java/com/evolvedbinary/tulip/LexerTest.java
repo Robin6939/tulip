@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 
 import static com.evolvedbinary.tulip.LexerConstants.BUFFER_SIZE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,6 +22,8 @@ public class LexerTest {
         XPath10Lexer lexer = new XPath10Lexer(fs, BUFFER_SIZE, xmlSpecification);
         String testing[] = {"\"What\"", "\"are\"", "\"You\"", "5", "\"Planning\"", "10", "\"gugu\"", "56", "31", "23", "42", "\"my name is robin\"", "88", "11111", "904802", "\"this is an alphanumberic 123\""};
         int count = 0;
+
+        Instant start = Instant.now();
         while(true) {
             Token t = lexer.next();
             if(t.getTokenType()==null)
@@ -28,5 +32,7 @@ public class LexerTest {
             System.out.println(lexeme);
             assertEquals(lexeme, testing[count++]);
         }
+        Instant end = Instant.now();
+        System.out.println("Execution Time: " + Duration.between(start, end).toMillis() + " ms");
     }
 }
