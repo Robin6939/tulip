@@ -69,7 +69,7 @@ public class XPath10Lexer extends AbstractLexer {
             decrementBegin();
         }
 
-        if (b == 117) {
+        if (b == -1) {
             System.out.println("Reached end of file");
             tokenType = TokenType.EOF;
         } else if(isLetter(b)) {
