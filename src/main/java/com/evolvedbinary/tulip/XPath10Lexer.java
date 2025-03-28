@@ -15,9 +15,6 @@
 package com.evolvedbinary.tulip;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class XPath10Lexer extends AbstractLexer {
 
@@ -69,7 +66,7 @@ public class XPath10Lexer extends AbstractLexer {
             readNextChar();
             b = forwardBuffer[forward];
             resetLexemeBegin();
-            decrementBegin(); //todo -> see if a better code design can replace this
+            decrementBegin();
         }
 
         if (b == 117) {
@@ -211,11 +208,21 @@ public class XPath10Lexer extends AbstractLexer {
         }
         // TODO(AR) set line number, column number
         try (Token token = getFreeToken()) { // doing this for not letting many token objects get created in runtime
+//            token.tokenType = tokenType;
+//            int tokenLength = ((forward-lexemeBegin+1>0)?(forward-lexemeBegin+1):(forward-lexemeBegin+1+getBufferSize()));
+//            byte[] currentToken = new byte[tokenLength];
+//            populateLexeme(currentToken);
+//            token.lexeme = currentToken;
+//            resetLexemeBegin();
+//            return token;
+
             token.tokenType = tokenType;
-            int tokenLength = ((forward-lexemeBegin+1>0)?(forward-lexemeBegin+1):(forward-lexemeBegin+1+getBufferSize()));
-            byte[] currentToken = new byte[tokenLength];
-            populateLexeme(currentToken);
-            token.lexeme = currentToken;
+            token.forwardBuffer = forwardBuffer;
+            token.beginBuffer = beginBuffer;
+            token.forward = forward;
+            token.lexemeBegin = lexemeBegin;
+            token.beginOffset = beginOffset;
+            token.forwardOffset = forwardOffset;
             resetLexemeBegin();
             return token;
         } catch (Exception e) {
@@ -224,13 +231,6 @@ public class XPath10Lexer extends AbstractLexer {
         }
     }
 
-    /**
-     * Determines if the character is a digit.
-     * {@see https://www.w3.org/TR/xpath-10/#NT-Digits}
-     *
-     * @param b the character to test.
-     * @return true if the character is a digit, false otherwise.
-     */
     boolean isDigit(final byte b) {
         return b >= ZERO && b <= NINE;
     }

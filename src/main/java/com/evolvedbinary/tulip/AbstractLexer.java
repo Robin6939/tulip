@@ -44,8 +44,8 @@ abstract class AbstractLexer implements Lexer {
     int forward = -1;
     private int lexemeBeginOriginal = 0;
     private int forwardOriginal = -1;
-    private int beginOffset = 0;
-    private int forwardOffset = 0;
+    int beginOffset = 0;
+    int forwardOffset = 0;
 
 
     private final Deque<Token> freeTokens = new ArrayDeque<>();
