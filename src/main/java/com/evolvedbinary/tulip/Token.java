@@ -43,7 +43,7 @@ public class Token implements AutoCloseable {
         if(beginOffset == forwardOffset) {
             return new String(forwardBuffer, lexemeBegin, forward - lexemeBegin + 1);
         } else {
-            return (new String(beginBuffer, lexemeBegin, beginBuffer.length-lexemeBegin)).concat(new String(forwardBuffer, 0, forward));
+            return (new String(beginBuffer, lexemeBegin, beginBuffer.length-lexemeBegin)).concat(new String(forwardBuffer, 0, forward+1));
         }
     }
 

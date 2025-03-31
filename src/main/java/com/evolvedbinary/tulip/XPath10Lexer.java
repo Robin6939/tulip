@@ -56,7 +56,7 @@ public class XPath10Lexer extends AbstractLexer {
 
     @Override
     public Token next() throws IOException {
-
+        resetLexemeBegin();
         readNextChar();
         byte b = forwardBuffer[forward];
         TokenType tokenType = null;
@@ -91,6 +91,7 @@ public class XPath10Lexer extends AbstractLexer {
                         break;
                     }
                 }else {
+//                    throw new IOException("Should not follow minus");
                     break;
                 }
             }
@@ -208,14 +209,6 @@ public class XPath10Lexer extends AbstractLexer {
         }
         // TODO(AR) set line number, column number
         try (Token token = getFreeToken()) { // doing this for not letting many token objects get created in runtime
-//            token.tokenType = tokenType;
-//            int tokenLength = ((forward-lexemeBegin+1>0)?(forward-lexemeBegin+1):(forward-lexemeBegin+1+getBufferSize()));
-//            byte[] currentToken = new byte[tokenLength];
-//            populateLexeme(currentToken);
-//            token.lexeme = currentToken;
-//            resetLexemeBegin();
-//            return token;
-
             token.tokenType = tokenType;
             token.forwardBuffer = forwardBuffer;
             token.beginBuffer = beginBuffer;
@@ -223,7 +216,9 @@ public class XPath10Lexer extends AbstractLexer {
             token.lexemeBegin = lexemeBegin;
             token.beginOffset = beginOffset;
             token.forwardOffset = forwardOffset;
-            resetLexemeBegin();
+//            System.out.println("Begin buffer: " + new String(beginBuffer));
+//            System.out.println("Forward buffer: "+ new String(forwardBuffer));
+//            System.out.println("Begin pointer: " + lexemeBegin + " Forward Pointer: "+ forward);
             return token;
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

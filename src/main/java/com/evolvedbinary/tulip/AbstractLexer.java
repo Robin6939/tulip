@@ -73,6 +73,7 @@ abstract class AbstractLexer implements Lexer {
      * Advance the forward pointer one character.
      */
     protected void readNextChar() throws IOException {
+
         readNextChars(1);
     }
 
@@ -96,7 +97,7 @@ abstract class AbstractLexer implements Lexer {
     }
 
     private void incrementForwardPointer(int count) {
-        if(forward+count>=bufferSize) {
+        if(forward+count >= bufferSize) {
             forwardOffset += bufferSize;
             switchForwardBuffer();
         }
@@ -105,6 +106,7 @@ abstract class AbstractLexer implements Lexer {
     }
 
     private void switchForwardBuffer() {
+//        System.out.println("Switch buffers - descarding begin buffer which was: "+ new String(beginBuffer));
         if(forwardBuffer==buffer1) {
             forwardBuffer = buffer2;
         } else {
@@ -134,9 +136,11 @@ abstract class AbstractLexer implements Lexer {
         if(beginBuffer==buffer1) {
             beginBuffer=buffer2;
             loadBuffer(buffer1);
+//            System.out.println("New buffer has been loaded: " + new String(buffer1));
         } else {
             beginBuffer=buffer1;
             loadBuffer(buffer2);
+//            System.out.println("New buffer has been loaded: " + new String(buffer2));
         }
     }
 
@@ -193,7 +197,7 @@ abstract class AbstractLexer implements Lexer {
     protected Token getFreeToken() {
         @Nullable Token freeToken = freeTokens.peek();
         if (freeToken == null) {
-            System.out.println("New token created");
+//            System.out.println("New token created");
             freeToken = new Token(this);
         }
         return freeToken;
