@@ -46,10 +46,6 @@ public enum TokenType {
     OR,
     DIV,
     MOD,
-    NODE_TYPE,
-    TEXT_NODE,
-    COMMENT_NODE,
-    PROCESSING_INSTRUCTION,
     COLON,
     EOF
 }
