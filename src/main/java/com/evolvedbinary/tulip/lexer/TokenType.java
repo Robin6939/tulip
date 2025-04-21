@@ -20,6 +20,8 @@ public enum TokenType {
     FUNCTION,
     DIGITS,
     NUMBER,
+    DECIMAL,
+    DOUBLE,
     SLASH,
     DOUBLE_SLASH,
     UNION_OPERATOR,
@@ -47,5 +49,9 @@ public enum TokenType {
     DIV,
     MOD,
     COLON,
+    COMMENT,
+    QName,
+    NCName,
+    VARIABLE_REFERENCE,
     EOF
 }

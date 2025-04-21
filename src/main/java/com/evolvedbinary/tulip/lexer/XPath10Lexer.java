@@ -195,6 +195,51 @@ public class XPath10Lexer extends AbstractLexer {
         }
     }
 
+    TokenType handleNCNameorQNameorFunctionNameorAxisNameorKeyword() throws IOException {
+        TrieNode node = keywordTrie.getRoot();
+        node = keywordTrie.traverse(forwardBuffer[forward], node); // Traverse the first letter
+        int colonCount = 0;
+
+        while (true) {
+            readNextChar();
+            byte currentByte = forwardBuffer[forward];
+
+            if (isLetter(currentByte) || currentByte == MINUS || currentByte == FULL_STOP || isDigit(currentByte) || currentByte == COLON || currentByte == UNDERSCORE) {
+                // Continue traversing if it's a letter or could be an identifier
+                if (node != null) {
+                    node = keywordTrie.traverse(currentByte, node);
+                }
+                if(currentByte == COLON)
+                    colonCount++;
+            } else {
+                // Not a letter or valid hyphen sequence, end of potential identifier/keyword
+                break;
+            }
+        }
+        decrementForward(); // Backtrack to the last token
+        if(colonCount>1) {
+            throw new IOException("Invalid Identifier");
+        }
+        // Determine token type based on final Trie node state
+        if (node != null && node.isFunction) {
+            return TokenType.FUNCTION;
+        } else if(node != null && node.isAxis) {
+            return TokenType.AXIS_NAME;
+        } else if(node != null && node.isKeyword) {
+            if(beginBuffer[lexemeBegin] == 0x61) {
+                return TokenType.AND;
+            } else if(beginBuffer[lexemeBegin] == 0x6F) {
+                return TokenType.OR;
+            } else if(beginBuffer[lexemeBegin] == 0x64) {
+                return TokenType.DIV;
+            } else {
+                return TokenType.MOD;
+            }
+        } else {
+            return colonCount==1?TokenType.QName:TokenType.NCName; // Matched prefix or not a keyword
+        }
+    }
+
     /**
      * Handles tokens starting with a underscore, which could be an identifier,
      * calls upon handleIdentifierOrKeyword() after reading underscore
@@ -217,7 +262,7 @@ public class XPath10Lexer extends AbstractLexer {
      * @return TokenType.DIGITS (representing a number literal).
      * @throws IOException If an I/O error occurs.
      */
-    private TokenType handleNumberStartingWithDigit() throws IOException {
+    TokenType handleNumberStartingWithDigit() throws IOException {
         TokenType tokenType = TokenType.DIGITS;
         // Consume initial sequence of digits
         do {
@@ -288,7 +333,7 @@ public class XPath10Lexer extends AbstractLexer {
      * @return TokenType.LITERAL.
      * @throws IOException If an I/O error occurs or the closing quote is not found.
      */
-    private TokenType handleLiteral(final byte quoteByte) throws IOException {
+    public TokenType handleLiteral(final byte quoteByte) throws IOException {
         do {
             readNextChar();
             // Check for EOF before finding the closing quote
