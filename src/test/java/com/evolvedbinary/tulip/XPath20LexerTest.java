@@ -136,118 +136,76 @@ public class XPath20LexerTest {
         );
         assertEquals(expected, lex(input));
     }
-//
-//    // --- Operators ---
-//    @Test
-//    void testXPath20Operators() throws IOException {
-//        String input = " => eq ne lt le gt ge is << >> := ";
-//        List<TokenInfo> expected = List.of(
-//                new TokenInfo(TokenType.ARROW, "=>"),
-//                new TokenInfo(TokenType.IDENTIFIER, "eq"),
-//                new TokenInfo(TokenType.IDENTIFIER, "ne"),
-//                new TokenInfo(TokenType.IDENTIFIER, "lt"),
-//                new TokenInfo(TokenType.IDENTIFIER, "le"),
-//                new TokenInfo(TokenType.IDENTIFIER, "gt"),
-//                new TokenInfo(TokenType.IDENTIFIER, "ge"),
-//                new TokenInfo(TokenType.IDENTIFIER, "is"),
-//                new TokenInfo(TokenType.NODE_BEFORE, "<<"),
-//                new TokenInfo(TokenType.NODE_AFTER, ">>"),
-//                new TokenInfo(TokenType.NAMESPACE_SEPARATOR, ":="),
-//                new TokenInfo(TokenType.EOF, "")
-//        );
-//        assertEquals(expected, lex(input));
-//    }
-//
-//    // --- Keywords ---
-//    @Test
-//    void testXPath20Keywords() throws IOException {
-//        String input = " instance of cast as treat return for in some every if then else typeswitch case default at where order by ascending descending stable union intersect except to satisfies collation import schema module namespace preserve strip copy-of deep-equal exactly-one zero-or-one one-or-more ";
-//        List<TokenInfo> expected = List.of(
-//                new TokenInfo(TokenType.INSTANCE_OF, "instance"),
-//                new TokenInfo(TokenType.OF, "of"),
-//                new TokenInfo(TokenType.CAST, "cast"),
-//                new TokenInfo(TokenType.AS, "as"),
-//                new TokenInfo(TokenType.TREAT, "treat"),
-//                new TokenInfo(TokenType.RETURN, "return"),
-//                new TokenInfo(TokenType.FOR, "for"),
-//                new TokenInfo(TokenType.IN, "in"),
-//                new TokenInfo(TokenType.SOME, "some"),
-//                new TokenInfo(TokenType.EVERY, "every"),
-//                new TokenInfo(TokenType.IF, "if"),
-//                new TokenInfo(TokenType.THEN, "then"),
-//                new TokenInfo(TokenType.ELSE, "else"),
-//                new TokenInfo(TokenType.TYPESWITCH, "typeswitch"),
-//                new TokenInfo(TokenType.CASE, "case"),
-//                new TokenInfo(TokenType.DEFAULT, "default"),
-//                new TokenInfo(TokenType.AT, "at"),
-//                new TokenInfo(TokenType.WHERE, "where"),
-//                new TokenInfo(TokenType.ORDER, "order"),
-//                new TokenInfo(TokenType.BY, "by"),
-//                new TokenInfo(TokenType.ASCENDING, "ascending"),
-//                new TokenInfo(TokenType.DESCENDING, "descending"),
-//                new TokenInfo(TokenType.STABLE, "stable"),
-//                new TokenInfo(TokenType.UNION, "union"),
-//                new TokenInfo(TokenType.INTERSECT, "intersect"),
-//                new TokenInfo(TokenType.EXCEPT, "except"),
-//                new TokenInfo(TokenType.TO, "to"),
-//                new TokenInfo(TokenType.SATISFIES, "satisfies"),
-//                new TokenInfo(TokenType.COLLATION, "collation"),
-//                new TokenInfo(TokenType.IMPORT, "import"),
-//                new TokenInfo(TokenType.SCHEMA, "schema"),
-//                new TokenInfo(TokenType.MODULE, "module"),
-//                new TokenInfo(TokenType.NAMESPACE, "namespace"),
-//                new TokenInfo(TokenType.PRESERVE, "preserve"),
-//                new TokenInfo(TokenType.STRIP, "strip"),
-//                new TokenInfo(TokenType.COPY_OF, "copy-of"),
-//                new TokenInfo(TokenType.DEEP_EQUAL, "deep-equal"),
-//                new TokenInfo(TokenType.EXACTLY_ONE, "exactly-one"),
-//                new TokenInfo(TokenType.ZERO_OR_ONE, "zero-or-one"),
-//                new TokenInfo(TokenType.ONE_OR_MORE, "one-or-more"),
-//                new TokenInfo(TokenType.EOF, "")
-//        );
-//        assertEquals(expected, lex(input));
-//    }
-//
-//    // --- Other Punctuation ---
-//    @Test
-//    void testXPath20Braces() throws IOException {
-//        String input = " { } ";
-//        List<TokenInfo> expected = List.of(
-//                new TokenInfo(TokenType.OPEN_BRACE, "{"),
-//                new TokenInfo(TokenType.CLOSE_BRACE, "}"),
-//                new TokenInfo(TokenType.EOF, "")
-//        );
-//        assertEquals(expected, lex(input));
-//    }
-//
-//    @Test
-//    void testXPath20Semicolon() throws IOException {
-//        String input = " ; ";
-//        List<TokenInfo> expected = List.of(
-//                new TokenInfo(TokenType.SEMICOLON, ";"),
-//                new TokenInfo(TokenType.EOF, "")
-//        );
-//        assertEquals(expected, lex(input));
-//    }
-//
-//    // --- Braced URILiterals (Basic Test) ---
-//    @Test
-//    void testBracedURILiteralXPath20() throws IOException {
-//        String input = " Q{http://example.com}local ";
-//        List<TokenInfo> expected = List.of(
-//                new TokenInfo(TokenType.IDENTIFIER, "Q"),
-//                new TokenInfo(TokenType.OPEN_BRACE, "{"),
-//                new TokenInfo(TokenType.IDENTIFIER, "http"),
-//                new TokenInfo(TokenType.COLON, ":"),
-//                new TokenInfo(TokenType.SLASH, "/"),
-//                new TokenInfo(TokenType.SLASH, "/"),
-//                new TokenInfo(TokenType.IDENTIFIER, "example"),
-//                new TokenInfo(TokenType.FULL_STOP, "."),
-//                new TokenInfo(TokenType.IDENTIFIER, "com"),
-//                new TokenInfo(TokenType.CLOSE_BRACE, "}"),
-//                new TokenInfo(TokenType.IDENTIFIER, "local"),
-//                new TokenInfo(TokenType.EOF, "")
-//        );
-//        assertEquals(expected, lex(input));
-//    }
+
+    // --- Operators ---
+    @Test
+    void testXPath20Operators() throws IOException {
+        String input = " => eq ne lt le gt ge is << >> := ";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.ARROW, "=>"),
+                new TokenInfo(TokenType.IDENTIFIER, "eq"),
+                new TokenInfo(TokenType.IDENTIFIER, "ne"),
+                new TokenInfo(TokenType.IDENTIFIER, "lt"),
+                new TokenInfo(TokenType.IDENTIFIER, "le"),
+                new TokenInfo(TokenType.IDENTIFIER, "gt"),
+                new TokenInfo(TokenType.IDENTIFIER, "ge"),
+                new TokenInfo(TokenType.IDENTIFIER, "is"),
+                new TokenInfo(TokenType.NODE_BEFORE, "<<"),
+                new TokenInfo(TokenType.NODE_AFTER, ">>"),
+                new TokenInfo(TokenType.NAMESPACE_SEPARATOR, ":="),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
+
+    // --- Keywords ---
+    @Test
+    void testXPath20Keywords() throws IOException {
+        String input = " instance of cast as treat return for in some every if then else typeswitch case default at where order by ascending descending stable union intersect except to satisfies collation import schema module namespace preserve strip copy-of deep-equal exactly-one zero-or-one one-or-more ";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.INSTANCE_OF, "instance"),
+                new TokenInfo(TokenType.OF, "of"),
+                new TokenInfo(TokenType.CAST, "cast"),
+                new TokenInfo(TokenType.AS, "as"),
+                new TokenInfo(TokenType.TREAT, "treat"),
+                new TokenInfo(TokenType.RETURN, "return"),
+                new TokenInfo(TokenType.FOR, "for"),
+                new TokenInfo(TokenType.IN, "in"),
+                new TokenInfo(TokenType.SOME, "some"),
+                new TokenInfo(TokenType.EVERY, "every"),
+                new TokenInfo(TokenType.IF, "if"),
+                new TokenInfo(TokenType.THEN, "then"),
+                new TokenInfo(TokenType.ELSE, "else"),
+                new TokenInfo(TokenType.TYPESWITCH, "typeswitch"),
+                new TokenInfo(TokenType.CASE, "case"),
+                new TokenInfo(TokenType.DEFAULT, "default"),
+                new TokenInfo(TokenType.AT, "at"),
+                new TokenInfo(TokenType.WHERE, "where"),
+                new TokenInfo(TokenType.ORDER, "order"),
+                new TokenInfo(TokenType.BY, "by"),
+                new TokenInfo(TokenType.ASCENDING, "ascending"),
+                new TokenInfo(TokenType.DESCENDING, "descending"),
+                new TokenInfo(TokenType.STABLE, "stable"),
+                new TokenInfo(TokenType.UNION, "union"),
+                new TokenInfo(TokenType.INTERSECT, "intersect"),
+                new TokenInfo(TokenType.EXCEPT, "except"),
+                new TokenInfo(TokenType.TO, "to"),
+                new TokenInfo(TokenType.SATISFIES, "satisfies"),
+                new TokenInfo(TokenType.COLLATION, "collation"),
+                new TokenInfo(TokenType.IMPORT, "import"),
+                new TokenInfo(TokenType.SCHEMA, "schema"),
+                new TokenInfo(TokenType.MODULE, "module"),
+                new TokenInfo(TokenType.NAMESPACE, "namespace"),
+                new TokenInfo(TokenType.PRESERVE, "preserve"),
+                new TokenInfo(TokenType.STRIP, "strip"),
+                new TokenInfo(TokenType.COPY_OF, "copy-of"),
+                new TokenInfo(TokenType.DEEP_EQUAL, "deep-equal"),
+                new TokenInfo(TokenType.EXACTLY_ONE, "exactly-one"),
+                new TokenInfo(TokenType.ZERO_OR_ONE, "zero-or-one"),
+                new TokenInfo(TokenType.ONE_OR_MORE, "one-or-more"),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
+
 }

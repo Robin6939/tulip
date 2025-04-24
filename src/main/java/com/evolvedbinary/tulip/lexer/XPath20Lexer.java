@@ -101,7 +101,7 @@ public class XPath20Lexer extends XPath10Lexer {
             tokenType = handleNCNameorQNameorFunctionNameorAxisNameorKeyword();
         } else if(firstByte == UNDERSCORE) {
             tokenType = handleNCNameorQNameorFunctionNameorAxisNameorKeyword();
-        }else if (isDigit(firstByte)) {
+        } else if (isDigit(firstByte)) {
             tokenType = handleNumberStartingWithDigit();
         } else if(firstByte == FULL_STOP) {
             readNextChar();
@@ -113,8 +113,6 @@ public class XPath20Lexer extends XPath10Lexer {
             tokenType = handleLiteral(firstByte);
 //        } else if (firstByte == MINUS) {
 //            tokenType = handleNegativeNumbers();
-//        } else if (firstByte == QUOTATION_MARK || firstByte == APOSTROPHE) {
-//            tokenType = handleLiteral(firstByte);
         } else if (firstByte == LPAREN) {
             readNextChar();
             if(forwardBuffer[forward] == COLON) {

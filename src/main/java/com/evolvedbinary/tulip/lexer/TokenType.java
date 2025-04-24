@@ -53,5 +53,9 @@ public enum TokenType {
     QName,
     NCName,
     VARIABLE_REFERENCE,
+    ARROW,
+    NODE_BEFORE,
+    NODE_AFTER,
+    NAMESPACE_SEPARATOR,
     EOF
 }

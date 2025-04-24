@@ -28,6 +28,17 @@ public class XPath10Lexer extends AbstractLexer {
     private static Trie buildKeywordTrie() {
         Trie trie = new Trie();
 
+        // --- Identifier Names ---
+        List<String> identifier = Arrays.asList(
+                "=>", "eq", "ne", "lt",
+                "le", "gt", "ge",
+                "is", "<<", ">>",
+                ":="
+        );
+        for (String axis : identifier) {
+            trie.insert(axis, false, true);
+        }
+
         // --- Axis Names ---
         List<String> axisNames = Arrays.asList(
                 "ancestor", "ancestor-or-self", "attribute", "child",
@@ -199,7 +210,6 @@ public class XPath10Lexer extends AbstractLexer {
         TrieNode node = keywordTrie.getRoot();
         node = keywordTrie.traverse(forwardBuffer[forward], node); // Traverse the first letter
         int colonCount = 0;
-
         while (true) {
             readNextChar();
             byte currentByte = forwardBuffer[forward];
