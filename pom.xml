@@ -112,9 +112,10 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>${project.build.source}</source>
-                    <target>${project.build.target}</target>
+                    <source>23</source>
+                    <target>23</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgs>--enable-preview</compilerArgs>
                 </configuration>
             </plugin>
 

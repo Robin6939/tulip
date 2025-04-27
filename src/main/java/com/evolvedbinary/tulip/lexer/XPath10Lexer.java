@@ -36,8 +36,15 @@ public class XPath10Lexer extends AbstractLexer {
                 ":="
         );
         for (String axis : identifier) {
-            trie.insert(axis, false, true);
+            trie.insert(axis, TokenType.IDENTIFIER);
         }
+
+        // --- Operator Names ---
+        trie.insert("=>", TokenType.ARROW);
+        trie.insert("<<", TokenType.NODE_BEFORE);
+        trie.insert(">>", TokenType.NODE_AFTER);
+        trie.insert(":=", TokenType.NAMESPACE_SEPARATOR);
+
 
         // --- Axis Names ---
         List<String> axisNames = Arrays.asList(
@@ -47,7 +54,7 @@ public class XPath10Lexer extends AbstractLexer {
                 "preceding", "preceding-sibling", "self"
         );
         for (String axis : axisNames) {
-            trie.insert(axis, false, true);
+            trie.insert(axis, TokenType.AXIS_NAME);
         }
 
         // --- Function Names ---
@@ -67,16 +74,55 @@ public class XPath10Lexer extends AbstractLexer {
                 "node", "text", "comment", "processing-instruction"
         );
         for (String function : functionNames) {
-            trie.insert(function, true, false);
+            trie.insert(function, TokenType.FUNCTION);
         }
 
         // --- Arithmetic Operator Names ---
-        List<String> arithmeticOperatorNames = Arrays.asList(
-                "and", "or", "div", "mod"
-        );
-        for (String op : arithmeticOperatorNames) {
-            trie.insert(op, false, false);
-        }
+        trie.insert("and", TokenType.AND);
+        trie.insert("or", TokenType.OR);
+        trie.insert("div", TokenType.DIV);
+        trie.insert("mod", TokenType.MOD);
+
+        // --- XPath 2.0 Keywords ---
+        trie.insert("instance", TokenType.INSTANCE_OF);
+        trie.insert("of", TokenType.OF);
+        trie.insert("cast", TokenType.CAST);
+        trie.insert("as", TokenType.AS);
+        trie.insert("treat", TokenType.TREAT);
+        trie.insert("return", TokenType.RETURN);
+        trie.insert("for", TokenType.FOR);
+        trie.insert("in", TokenType.IN);
+        trie.insert("some", TokenType.SOME);
+        trie.insert("every", TokenType.EVERY);
+        trie.insert("if", TokenType.IF);
+        trie.insert("then", TokenType.THEN);
+        trie.insert("else", TokenType.ELSE);
+        trie.insert("typeswitch", TokenType.TYPESWITCH);
+        trie.insert("case", TokenType.CASE);
+        trie.insert("default", TokenType.DEFAULT);
+        trie.insert("at", TokenType.AT);
+        trie.insert("where", TokenType.WHERE);
+        trie.insert("order", TokenType.ORDER);
+        trie.insert("by", TokenType.BY);
+        trie.insert("ascending", TokenType.ASCENDING);
+        trie.insert("descending", TokenType.DESCENDING);
+        trie.insert("stable", TokenType.STABLE);
+        trie.insert("union", TokenType.UNION);
+        trie.insert("intersect", TokenType.INTERSECT);
+        trie.insert("except", TokenType.EXCEPT);
+        trie.insert("to", TokenType.TO);
+        trie.insert("satisfies", TokenType.SATISFIES);
+        trie.insert("collation", TokenType.COLLATION);
+        trie.insert("import", TokenType.IMPORT);
+        trie.insert("schema", TokenType.SCHEMA);
+        trie.insert("module", TokenType.MODULE);
+        trie.insert("preserve", TokenType.PRESERVE);
+        trie.insert("strip", TokenType.STRIP);
+        trie.insert("copy-of", TokenType.COPY_OF);
+        trie.insert("deep-equal", TokenType.DEEP_EQUAL);
+        trie.insert("exactly-one", TokenType.EXACTLY_ONE);
+        trie.insert("zero-or-one", TokenType.ZERO_OR_ONE);
+        trie.insert("one-or-more", TokenType.ONE_OR_MORE);
 
         // System.out.println("Trie has been created and populated"); // Keep commented out or remove for production
         return trie;
@@ -187,23 +233,9 @@ public class XPath10Lexer extends AbstractLexer {
         }
         decrementForward(); // Backtrack to the last token
         // Determine token type based on final Trie node state
-        if (node != null && node.isFunction) {
-            return TokenType.FUNCTION;
-        } else if(node != null && node.isAxis) {
-            return TokenType.AXIS_NAME;
-        } else if(node != null && node.isKeyword) {
-            if(beginBuffer[lexemeBegin] == 0x61) {
-                return TokenType.AND;
-            } else if(beginBuffer[lexemeBegin] == 0x6F) {
-                return TokenType.OR;
-            } else if(beginBuffer[lexemeBegin] == 0x64) {
-                return TokenType.DIV;
-            } else {
-                return TokenType.MOD;
-            }
-        } else {
-            return TokenType.IDENTIFIER; // Matched prefix or not a keyword
-        }
+        if(node!=null && node.isKeyword)
+            return node.tokenType;
+        return TokenType.IDENTIFIER;
     }
 
     TokenType handleNCNameorQNameorFunctionNameorAxisNameorKeyword() throws IOException {
@@ -214,7 +246,7 @@ public class XPath10Lexer extends AbstractLexer {
             readNextChar();
             byte currentByte = forwardBuffer[forward];
 
-            if (isLetter(currentByte) || currentByte == MINUS || currentByte == FULL_STOP || isDigit(currentByte) || currentByte == COLON || currentByte == UNDERSCORE) {
+            if (isLetter(currentByte) || currentByte == MINUS || currentByte == FULL_STOP || isDigit(currentByte) || currentByte == COLON || currentByte == UNDERSCORE || currentByte == EQUALS || currentByte == GREATER_THAN || currentByte == LESS_THAN) {
                 // Continue traversing if it's a letter or could be an identifier
                 if (node != null) {
                     node = keywordTrie.traverse(currentByte, node);
@@ -230,24 +262,10 @@ public class XPath10Lexer extends AbstractLexer {
         if(colonCount>1) {
             throw new IOException("Invalid Identifier");
         }
-        // Determine token type based on final Trie node state
-        if (node != null && node.isFunction) {
-            return TokenType.FUNCTION;
-        } else if(node != null && node.isAxis) {
-            return TokenType.AXIS_NAME;
-        } else if(node != null && node.isKeyword) {
-            if(beginBuffer[lexemeBegin] == 0x61) {
-                return TokenType.AND;
-            } else if(beginBuffer[lexemeBegin] == 0x6F) {
-                return TokenType.OR;
-            } else if(beginBuffer[lexemeBegin] == 0x64) {
-                return TokenType.DIV;
-            } else {
-                return TokenType.MOD;
-            }
-        } else {
-            return colonCount==1?TokenType.QName:TokenType.NCName; // Matched prefix or not a keyword
+        if(node != null && node.isKeyword) {
+            return node.tokenType;
         }
+        return colonCount==1?TokenType.QName:TokenType.NCName; // Matched prefix or not a keyword
     }
 
     /**
@@ -257,7 +275,7 @@ public class XPath10Lexer extends AbstractLexer {
      * @return The determined TokenType (IDENTIFIER, AXIS_NAME, or FUNCTION, or Arithmetic Keyword).
      * @throws IOException If an I/O error occurs.
      */
-    private TokenType handleIdentifierStartingWithUnderscore() throws IOException {
+    public TokenType handleIdentifierStartingWithUnderscore() throws IOException {
         readNextChar();
         if (isLetter(forwardBuffer[forward])) {
             return handleIdentifierOrKeyword();

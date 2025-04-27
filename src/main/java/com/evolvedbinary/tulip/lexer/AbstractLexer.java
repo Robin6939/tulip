@@ -372,5 +372,8 @@ abstract class AbstractLexer implements Lexer {
     protected static final byte DOLLAR      = 0x24; // '-'
     protected static final byte LOWERCASE_E          = 0x65; // 'e'
     protected static final byte UPPERCASE_E      = 0x45; // 'E'
+    protected static final byte LBRACE           = 0x7B; // '{'
+    protected static final byte RBRACE           = 0x7D; // '}'
+    protected static final byte SEMICOLON        = 0x3B; // ';'
 
 }

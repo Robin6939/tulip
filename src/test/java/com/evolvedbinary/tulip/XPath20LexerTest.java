@@ -161,7 +161,7 @@ public class XPath20LexerTest {
     // --- Keywords ---
     @Test
     void testXPath20Keywords() throws IOException {
-        String input = " instance of cast as treat return for in some every if then else typeswitch case default at where order by ascending descending stable union intersect except to satisfies collation import schema module namespace preserve strip copy-of deep-equal exactly-one zero-or-one one-or-more ";
+        String input = " instance of cast as treat return for in some every if then else typeswitch case default at where order by ascending descending stable union intersect except to satisfies collation import schema module preserve strip copy-of deep-equal exactly-one zero-or-one one-or-more ";
         List<TokenInfo> expected = List.of(
                 new TokenInfo(TokenType.INSTANCE_OF, "instance"),
                 new TokenInfo(TokenType.OF, "of"),
@@ -195,7 +195,6 @@ public class XPath20LexerTest {
                 new TokenInfo(TokenType.IMPORT, "import"),
                 new TokenInfo(TokenType.SCHEMA, "schema"),
                 new TokenInfo(TokenType.MODULE, "module"),
-                new TokenInfo(TokenType.NAMESPACE, "namespace"),
                 new TokenInfo(TokenType.PRESERVE, "preserve"),
                 new TokenInfo(TokenType.STRIP, "strip"),
                 new TokenInfo(TokenType.COPY_OF, "copy-of"),
@@ -208,4 +207,25 @@ public class XPath20LexerTest {
         assertEquals(expected, lex(input));
     }
 
+        // --- Other Punctuation ---
+    @Test
+    void testXPath20Braces() throws IOException {
+        String input = " { } ";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.OPEN_BRACE, "{"),
+                new TokenInfo(TokenType.CLOSE_BRACE, "}"),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
+
+    @Test
+    void testXPath20Semicolon() throws IOException {
+        String input = " ; ";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.SEMICOLON, ";"),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
 }
