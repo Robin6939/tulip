@@ -17,11 +17,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.evolvedbinary.tulip.constants.LexerConstants.BUFFER_SIZE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class XPath20LexerTest {
     private final XmlSpecification xmlSpecification = new XmlSpecification_1_0(); // Replace with XPath 2.0 spec if available
-    private static final int BUFFER_SIZE = 1024; // Define a buffer size
 
     // --- Helper Record ---
     record TokenInfo(TokenType type, String lexeme) {
@@ -207,7 +207,7 @@ public class XPath20LexerTest {
         assertEquals(expected, lex(input));
     }
 
-        // --- Other Punctuation ---
+    // --- Other Punctuation ---
     @Test
     void testXPath20Braces() throws IOException {
         String input = " { } ";
@@ -224,6 +224,84 @@ public class XPath20LexerTest {
         String input = " ; ";
         List<TokenInfo> expected = List.of(
                 new TokenInfo(TokenType.SEMICOLON, ";"),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
+
+//    @Test
+//    void testXPath20Random() throws IOException {
+//        String input = "some $x in (1,2,3) satisfies $x > 1";
+//        List<TokenInfo> expected = List.of(
+//        );
+//        assertEquals(expected, lex(input));
+//    }
+
+    @Test
+    void testSequenceExpression() throws IOException {
+        String input = "(1, 2, 3)";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.LPAREN, "("),
+                new TokenInfo(TokenType.DIGITS, "1"),
+                new TokenInfo(TokenType.COMMA, ","),
+                new TokenInfo(TokenType.DIGITS, "2"),
+                new TokenInfo(TokenType.COMMA, ","),
+                new TokenInfo(TokenType.DIGITS, "3"),
+                new TokenInfo(TokenType.RPAREN, ")"),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
+
+    @Test
+    void testFunctionCallWithArguments() throws IOException {
+        String input = "concat('a', \"b\", $x)";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.FUNCTION, "concat"),
+                new TokenInfo(TokenType.LPAREN, "("),
+                new TokenInfo(TokenType.LITERAL, "'a'"),
+                new TokenInfo(TokenType.COMMA, ","),
+                new TokenInfo(TokenType.LITERAL, "\"b\""),
+                new TokenInfo(TokenType.COMMA, ","),
+                new TokenInfo(TokenType.VARIABLE_REFERENCE, "$x"),
+                new TokenInfo(TokenType.RPAREN, ")"),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
+
+    @Test
+    void testNodeTests() throws IOException {
+        String input = "text() node() comment() processing-instruction()";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.FUNCTION, "text"),
+                new TokenInfo(TokenType.LPAREN, "("),
+                new TokenInfo(TokenType.RPAREN, ")"),
+                new TokenInfo(TokenType.FUNCTION, "node"),
+                new TokenInfo(TokenType.LPAREN, "("),
+                new TokenInfo(TokenType.RPAREN, ")"),
+                new TokenInfo(TokenType.FUNCTION, "comment"),
+                new TokenInfo(TokenType.LPAREN, "("),
+                new TokenInfo(TokenType.RPAREN, ")"),
+                new TokenInfo(TokenType.FUNCTION, "processing-instruction"),
+                new TokenInfo(TokenType.LPAREN, "("),
+                new TokenInfo(TokenType.RPAREN, ")"),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
+
+    @Test
+    void testAxisExpressions() throws IOException {
+        String input = "child::book/attribute::price";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.AXIS_NAME, "child"),
+                new TokenInfo(TokenType.AXIS_SEPARATOR, "::"),
+                new TokenInfo(TokenType.IDENTIFIER, "book"),
+                new TokenInfo(TokenType.SLASH, "/"),
+                new TokenInfo(TokenType.AXIS_NAME, "attribute"),
+                new TokenInfo(TokenType.AXIS_SEPARATOR, "::"),
+                new TokenInfo(TokenType.IDENTIFIER, "price"),
                 new TokenInfo(TokenType.EOF, "")
         );
         assertEquals(expected, lex(input));

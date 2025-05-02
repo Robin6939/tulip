@@ -379,7 +379,7 @@ public class XPath10Lexer extends AbstractLexer {
      * @return The corresponding TokenType.
      * @throws IOException If an I/O error occurs or an invalid sequence is found (e.g., '!' not followed by '=').
      */
-    private TokenType handleOperatorOrPunctuation(final byte firstByte) throws IOException {
+    public TokenType handleOperatorOrPunctuation(final byte firstByte) throws IOException {
         switch (firstByte) {
             case SLASH:
                 readNextChar();
@@ -396,6 +396,11 @@ public class XPath10Lexer extends AbstractLexer {
             case MULTIPLY_OPERATOR:
                 return TokenType.MULTIPLY_OPERATOR;
             case EQUALS:
+                readNextChar();
+                if(forwardBuffer[forward] == GREATER_THAN) {
+                    return TokenType.ARROW;
+                }
+                decrementForward();
                 return TokenType.EQUAL_TO;
             case LPAREN:
                 return TokenType.LPAREN;
@@ -411,6 +416,12 @@ public class XPath10Lexer extends AbstractLexer {
                 return TokenType.COMMA;
             case UNION_OPERATOR:
                 return TokenType.UNION_OPERATOR;
+            case LBRACE:
+                return TokenType.OPEN_BRACE;
+            case RBRACE:
+                return TokenType.CLOSE_BRACE;
+            case SEMICOLON:
+                return TokenType.SEMICOLON;
             case NOT:
                 readNextChar();
                 if (forwardBuffer[forward] == EQUALS) {
@@ -422,6 +433,8 @@ public class XPath10Lexer extends AbstractLexer {
                 readNextChar();
                 if (forwardBuffer[forward] == EQUALS) {
                     return TokenType.GREATER_THAN_EQUAL_TO; // '>='
+                } else if(forwardBuffer[forward] == GREATER_THAN) {
+                    return TokenType.NODE_AFTER;
                 } else {
                     decrementForward(); // Backtrack, it's just '>'
                     return TokenType.GREATER_THAN;
@@ -430,6 +443,8 @@ public class XPath10Lexer extends AbstractLexer {
                 readNextChar();
                 if (forwardBuffer[forward] == EQUALS) {
                     return TokenType.LESS_THAN_EQUAL_TO; // '<='
+                } else if(forwardBuffer[forward] == LESS_THAN) {
+                    return TokenType.NODE_BEFORE;
                 } else {
                     decrementForward(); // Backtrack, it's just '<'
                     return TokenType.LESS_THAN;
@@ -438,6 +453,8 @@ public class XPath10Lexer extends AbstractLexer {
                 readNextChar();
                 if (forwardBuffer[forward] == COLON) {
                     return TokenType.AXIS_SEPARATOR; // '::'
+                } else if(forwardBuffer[forward] == EQUALS) {
+                    return TokenType.NAMESPACE_SEPARATOR;
                 } else {
                     // Backtrack and return forward
                     decrementForward();

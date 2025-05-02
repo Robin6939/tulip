@@ -48,15 +48,10 @@ public class XPath20Lexer extends XPath10Lexer {
                 tokenType = handleComment();
             } else {
                 decrementForward();
+                tokenType = TokenType.LPAREN;
             }
-        } else if(forwardBuffer[forward] == LBRACE) {
-            tokenType = TokenType.OPEN_BRACE;
-        } else if(forwardBuffer[forward] == RBRACE) {
-            tokenType = TokenType.CLOSE_BRACE;
-        } else if(forwardBuffer[forward] == SEMICOLON) {
-            tokenType = TokenType.SEMICOLON;
         } else {
-            tokenType = handleNCNameorQNameorFunctionNameorAxisNameorKeyword();
+            tokenType = handleOperatorOrPunctuation(firstByte);
         }
 
         if(tokenType == TokenType.COMMENT)
