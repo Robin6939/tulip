@@ -18,6 +18,7 @@ public enum TokenType {
     LITERAL,
     AXIS_NAME,
     FUNCTION,
+    FUNCTION_KEYWORD,
     DIGITS,
     NUMBER,
     DECIMAL,
@@ -106,5 +107,6 @@ public enum TokenType {
     SIMPLE_MAP,
     MAP,
     QUESTION_MARK,
+    FUNCTION_LOOKUP,
     EOF
 }

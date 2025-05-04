@@ -69,7 +69,7 @@ public class XPath30LexerTest {
     void testInlineFunctionExpression() throws IOException {
         String input = "function($x as xs:integer) as xs:integer { $x + 1 }";
         List<TokenInfo> expected = List.of(
-                new TokenInfo(TokenType.FUNCTION, "function"),
+                new TokenInfo(TokenType.FUNCTION_KEYWORD, "function"),
                 new TokenInfo(TokenType.LPAREN, "("),
                 new TokenInfo(TokenType.VARIABLE_REFERENCE, "$x"),
                 new TokenInfo(TokenType.AS, "as"),
@@ -150,7 +150,7 @@ public class XPath30LexerTest {
     void testFunctionLookup() throws IOException {
         String input = "function-lookup(\"fn:upper-case\", 1)";
         List<TokenInfo> expected = List.of(
-                new TokenInfo(TokenType.IDENTIFIER, "function-lookup"),
+                new TokenInfo(TokenType.FUNCTION_LOOKUP, "function-lookup"),
                 new TokenInfo(TokenType.LPAREN, "("),
                 new TokenInfo(TokenType.LITERAL, "\"fn:upper-case\""),
                 new TokenInfo(TokenType.COMMA, ","),
@@ -168,7 +168,7 @@ public class XPath30LexerTest {
         List<TokenInfo> expected = List.of(
                 new TokenInfo(TokenType.LITERAL, "'abc'"),
                 new TokenInfo(TokenType.ARROW, "=>"),
-                new TokenInfo(TokenType.IDENTIFIER, "upper-case"),
+                new TokenInfo(TokenType.NCName, "upper-case"),
                 new TokenInfo(TokenType.LPAREN, "("),
                 new TokenInfo(TokenType.RPAREN, ")"),
                 new TokenInfo(TokenType.EOF, "")
@@ -179,12 +179,12 @@ public class XPath30LexerTest {
     // Test array/map access syntax
     @Test
     void testArrayAndMapAccess() throws IOException {
-        String input = "$arr?1 $map?\"key\"";
+        String input = "$arr?1 $mapper?\"key\"";
         List<TokenInfo> expected = List.of(
                 new TokenInfo(TokenType.VARIABLE_REFERENCE, "$arr"),
                 new TokenInfo(TokenType.QUESTION_MARK, "?"),
                 new TokenInfo(TokenType.DIGITS, "1"),
-                new TokenInfo(TokenType.VARIABLE_REFERENCE, "$map"),
+                new TokenInfo(TokenType.VARIABLE_REFERENCE, "$mapper"),
                 new TokenInfo(TokenType.QUESTION_MARK, "?"),
                 new TokenInfo(TokenType.LITERAL, "\"key\""),
                 new TokenInfo(TokenType.EOF, "")

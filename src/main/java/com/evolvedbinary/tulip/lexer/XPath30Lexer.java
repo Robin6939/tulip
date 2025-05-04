@@ -47,6 +47,9 @@ public class XPath30Lexer extends XPath20Lexer {
             readNextChar();
             if (isDigit(forwardBuffer[forward])) {
                 tokenType = handleNumberStartingWithDigit();
+            } else {
+                decrementForward();
+                tokenType = TokenType.DOT;
             }
         } else if (firstByte == QUOTATION_MARK || firstByte == APOSTROPHE) {
             tokenType = handleLiteral(firstByte);

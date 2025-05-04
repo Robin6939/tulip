@@ -404,6 +404,12 @@ abstract class AbstractLexer implements Lexer {
         trie.insert("zero-or-one", TokenType.ZERO_OR_ONE);
         trie.insert("one-or-more", TokenType.ONE_OR_MORE);
 
+
+        // --- XPath 3.0 Keywords ---
+        trie.insert("function", TokenType.FUNCTION_KEYWORD);
+        trie.insert("map", TokenType.MAP);
+        trie.insert("function-lookup", TokenType.FUNCTION_LOOKUP);
+
         // System.out.println("Trie has been created and populated"); // Keep commented out or remove for production
         return trie;
     }
@@ -463,12 +469,15 @@ abstract class AbstractLexer implements Lexer {
                 return TokenType.CLOSE_BRACE;
             case SEMICOLON:
                 return TokenType.SEMICOLON;
+            case QUESTION_MARK:
+                return TokenType.QUESTION_MARK;
             case NOT:
                 readNextChar();
                 if (forwardBuffer[forward] == EQUALS) {
                     return TokenType.NOT_EQUAL_TO; // '!='
                 } else {
-                    throw new IOException("Invalid character sequence: '!' must be followed by '=' in XPath 1.0 for '!=' operator.");
+                    decrementForward();
+                    return TokenType.SIMPLE_MAP; // for XPath 3.0
                 }
             case GREATER_THAN:
                 readNextChar();
