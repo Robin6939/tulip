@@ -229,13 +229,6 @@ public class XPath20LexerTest {
         assertEquals(expected, lex(input));
     }
 
-//    @Test
-//    void testXPath20Random() throws IOException {
-//        String input = "some $x in (1,2,3) satisfies $x > 1";
-//        List<TokenInfo> expected = List.of(
-//        );
-//        assertEquals(expected, lex(input));
-//    }
 
     @Test
     void testSequenceExpression() throws IOException {
@@ -297,11 +290,74 @@ public class XPath20LexerTest {
         List<TokenInfo> expected = List.of(
                 new TokenInfo(TokenType.AXIS_NAME, "child"),
                 new TokenInfo(TokenType.AXIS_SEPARATOR, "::"),
-                new TokenInfo(TokenType.IDENTIFIER, "book"),
+                new TokenInfo(TokenType.NCName, "book"),
                 new TokenInfo(TokenType.SLASH, "/"),
                 new TokenInfo(TokenType.AXIS_NAME, "attribute"),
                 new TokenInfo(TokenType.AXIS_SEPARATOR, "::"),
-                new TokenInfo(TokenType.IDENTIFIER, "price"),
+                new TokenInfo(TokenType.NCName, "price"),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
+
+    //Quantified Expressions
+    @Test
+    void testQuantifiedExpressions() throws IOException {
+        String input = "some $x in (1,2,3) satisfies $x > 1";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.SOME, "some"),
+                new TokenInfo(TokenType.VARIABLE_REFERENCE, "$x"),
+                new TokenInfo(TokenType.IN, "in"),
+                new TokenInfo(TokenType.LPAREN, "("),
+                new TokenInfo(TokenType.DIGITS, "1"),
+                new TokenInfo(TokenType.COMMA, ","),
+                new TokenInfo(TokenType.DIGITS, "2"),
+                new TokenInfo(TokenType.COMMA, ","),
+                new TokenInfo(TokenType.DIGITS, "3"),
+                new TokenInfo(TokenType.RPAREN, ")"),
+                new TokenInfo(TokenType.SATISFIES, "satisfies"),
+                new TokenInfo(TokenType.VARIABLE_REFERENCE, "$x"),
+                new TokenInfo(TokenType.GREATER_THAN, ">"),
+                new TokenInfo(TokenType.DIGITS, "1"),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
+
+
+    // Cast Expressions
+    @Test
+    void testCastExpressions() throws IOException {
+        String input = "xs:string('abc') castable as xs:integer";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.QName, "xs:string"),
+                new TokenInfo(TokenType.LPAREN, "("),
+                new TokenInfo(TokenType.LITERAL, "'abc'"),
+                new TokenInfo(TokenType.RPAREN, ")"),
+                new TokenInfo(TokenType.CASTABLE, "castable"),
+                new TokenInfo(TokenType.AS, "as"),
+                new TokenInfo(TokenType.QName, "xs:integer"),
+                new TokenInfo(TokenType.EOF, "")
+        );
+        assertEquals(expected, lex(input));
+    }
+
+    // Enclosed Expressions
+    @Test
+    void testEnclosedExpressions() throws IOException {
+        String input = "{1 + 2}, {\"hello\" || $nameRobin}";
+        List<TokenInfo> expected = List.of(
+                new TokenInfo(TokenType.OPEN_BRACE, "{"),
+                new TokenInfo(TokenType.DIGITS, "1"),
+                new TokenInfo(TokenType.PLUS, "+"),
+                new TokenInfo(TokenType.DIGITS, "2"),
+                new TokenInfo(TokenType.CLOSE_BRACE, "}"),
+                new TokenInfo(TokenType.COMMA, ","),
+                new TokenInfo(TokenType.OPEN_BRACE, "{"),
+                new TokenInfo(TokenType.LITERAL, "\"hello\""),
+                new TokenInfo(TokenType.CONCAT_OPERATOR, "||"),
+                new TokenInfo(TokenType.VARIABLE_REFERENCE, "$nameRobin"),
+                new TokenInfo(TokenType.CLOSE_BRACE, "}"),
                 new TokenInfo(TokenType.EOF, "")
         );
         assertEquals(expected, lex(input));

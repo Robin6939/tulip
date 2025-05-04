@@ -134,7 +134,7 @@ public class XPath20Lexer extends XPath10Lexer {
                  return TokenType.VARIABLE_REFERENCE;
             }
             else {
-                throw new IOException("Invalid variable name");
+                throw new IOException("Invalid variable name" + temp.toString());
             }
         } else {
             throw new IOException("Invalid variable name");

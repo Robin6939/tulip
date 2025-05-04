@@ -85,6 +85,7 @@ public class XPath10Lexer extends AbstractLexer {
 
         // --- XPath 2.0 Keywords ---
         trie.insert("instance", TokenType.INSTANCE_OF);
+        trie.insert("castable", TokenType.CASTABLE);
         trie.insert("of", TokenType.OF);
         trie.insert("cast", TokenType.CAST);
         trie.insert("as", TokenType.AS);
@@ -246,13 +247,23 @@ public class XPath10Lexer extends AbstractLexer {
             readNextChar();
             byte currentByte = forwardBuffer[forward];
 
+
+
             if (isLetter(currentByte) || currentByte == MINUS || currentByte == FULL_STOP || isDigit(currentByte) || currentByte == COLON || currentByte == UNDERSCORE || currentByte == EQUALS || currentByte == GREATER_THAN || currentByte == LESS_THAN) {
                 // Continue traversing if it's a letter or could be an identifier
+                if(currentByte == COLON) {
+                    readNextChar();
+                    if(forwardBuffer[forward] == COLON) { // Needs to be done so as to nto confuse an axis seperator with QName
+                        decrementForward();
+                        break;
+                    }
+                    decrementForward();
+                    colonCount++;
+                }
                 if (node != null) {
                     node = keywordTrie.traverse(currentByte, node);
                 }
-                if(currentByte == COLON)
-                    colonCount++;
+
             } else {
                 // Not a letter or valid hyphen sequence, end of potential identifier/keyword
                 break;
@@ -415,6 +426,11 @@ public class XPath10Lexer extends AbstractLexer {
             case COMMA:
                 return TokenType.COMMA;
             case UNION_OPERATOR:
+                readNextChar();
+                if(forwardBuffer[forward] == UNION_OPERATOR) {
+                    return TokenType.CONCAT_OPERATOR;
+                }
+                decrementForward();
                 return TokenType.UNION_OPERATOR;
             case LBRACE:
                 return TokenType.OPEN_BRACE;

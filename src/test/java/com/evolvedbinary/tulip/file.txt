@@ -1,1 +1,1 @@
-child::book/attribute::price
+ "double" 'single' "" '' "it's" '"quote"' 

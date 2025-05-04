@@ -104,6 +104,7 @@ abstract class AbstractLexer implements Lexer {
      */
     protected void readNextChar() throws IOException {
         incrementForwardPointer(1);
+//        System.out.println("Next character read is:" + forwardBuffer[forward]);
     }
 
     /**
