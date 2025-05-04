@@ -102,5 +102,9 @@ public enum TokenType {
     ONE_OR_MORE,
     OPEN_BRACE,
     CLOSE_BRACE,
+    DOT,
+    SIMPLE_MAP,
+    MAP,
+    QUESTION_MARK,
     EOF
 }

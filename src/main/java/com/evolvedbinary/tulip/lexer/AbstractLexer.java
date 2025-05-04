@@ -546,6 +546,7 @@ abstract class AbstractLexer implements Lexer {
     // ========================================================================
 
     protected static final byte QUOTATION_MARK = 0x22;
+    protected static final byte QUESTION_MARK  = 0x3F;
     protected static final byte APOSTROPHE     = 0x27;
     protected static final byte ZERO           = 0x30;
     protected static final byte NINE           = 0x39;
@@ -555,14 +556,14 @@ abstract class AbstractLexer implements Lexer {
     protected static final byte UPPERCASE_Z    = 0x5A;
 
     // Arithmetic Operators
-    protected static final byte PLUS        = 0x2B; // '+'
-    protected static final byte MINUS       = 0x2D; // '-'
-    protected static final byte UNDERSCORE       = 0x5F; // '-'
+    protected static final byte PLUS            = 0x2B; // '+'
+    protected static final byte MINUS           = 0x2D; // '-'
+    protected static final byte UNDERSCORE      = 0x5F; // '-'
     protected static final byte MULTIPLY_OPERATOR    = 0x2A; // '*'
 
     // Comparison Operators
     protected static final byte EQUALS      = 0x3D; // '='
-    protected static final byte NOT   = 0x21; // '!' (for "!=")
+    protected static final byte NOT         = 0x21; // '!' (for "!=")
     protected static final byte LESS_THAN   = 0x3C; // '<'
     protected static final byte GREATER_THAN = 0x3E; // '>'
 
@@ -573,19 +574,19 @@ abstract class AbstractLexer implements Lexer {
 
 
     // Parentheses & Other Symbols
-    protected static final byte LPAREN      = 0x28; // '('
-    protected static final byte RPAREN      = 0x29; // ')'
-    protected static final byte LBRACKET    = 0x5B; // '['
-    protected static final byte RBRACKET    = 0x5D; // ']'
-    protected static final byte AT_OPERATOR = 0x40; // '@'
-    protected static final byte COMMA       = 0x2C; // ','
-    protected static final byte UNION_OPERATOR = 0x7C; // '|'
-    protected static final byte COLON          = 0x3A; // ':'
-    protected static final byte DOLLAR      = 0x24; // '-'
-    protected static final byte LOWERCASE_E          = 0x65; // 'e'
-    protected static final byte UPPERCASE_E      = 0x45; // 'E'
-    protected static final byte LBRACE           = 0x7B; // '{'
-    protected static final byte RBRACE           = 0x7D; // '}'
-    protected static final byte SEMICOLON        = 0x3B; // ';'
+    protected static final byte LPAREN          = 0x28; // '('
+    protected static final byte RPAREN          = 0x29; // ')'
+    protected static final byte LBRACKET        = 0x5B; // '['
+    protected static final byte RBRACKET        = 0x5D; // ']'
+    protected static final byte AT_OPERATOR     = 0x40; // '@'
+    protected static final byte COMMA           = 0x2C; // ','
+    protected static final byte UNION_OPERATOR  = 0x7C; // '|'
+    protected static final byte COLON           = 0x3A; // ':'
+    protected static final byte DOLLAR          = 0x24; // '-'
+    protected static final byte LOWERCASE_E     = 0x65; // 'e'
+    protected static final byte UPPERCASE_E     = 0x45; // 'E'
+    protected static final byte LBRACE          = 0x7B; // '{'
+    protected static final byte RBRACE          = 0x7D; // '}'
+    protected static final byte SEMICOLON       = 0x3B; // ';'
 
 }

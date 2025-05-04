@@ -95,7 +95,7 @@ public class XPath20Lexer extends XPath10Lexer {
      * @return TokenType.COMMENT when a full comment is parsed
      * @throws IOException If an unterminated comment is detected
      */
-    private TokenType handleComment() throws IOException {
+    public TokenType handleComment() throws IOException {
         //it must be the start of a comment
         int nestingLevel = 1;
         while (true) {
@@ -127,7 +127,7 @@ public class XPath20Lexer extends XPath10Lexer {
      * @return TokenType.VARIABLE_REFERENCE if valid, or throws an IOException otherwise
      * @throws IOException If an invalid variable name is encountered
      */
-    private TokenType handleVariableReference() throws IOException {
+    public TokenType handleVariableReference() throws IOException {
         readNextChar();
         if (isLetter(forwardBuffer[forward]) || forwardBuffer[forward] == UNDERSCORE) {
             TokenType temp = handleNCNameorQNameorFunctionNameorAxisNameorKeyword();
