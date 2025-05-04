@@ -2,6 +2,7 @@ package com.evolvedbinary.tulip.lexer;
 
 import com.evolvedbinary.tulip.source.Source;
 import com.evolvedbinary.tulip.spec.XmlSpecification;
+import com.evolvedbinary.tulip.trie.TrieNode;
 
 import java.io.IOException;
 
@@ -139,6 +140,52 @@ public class XPath20Lexer extends XPath10Lexer {
         } else {
             throw new IOException("Invalid variable name");
         }
+    }
+
+    /**
+     * Handles NCNames or QNames or Keywords.
+     *
+     * @return TokenType.VARIABLE_REFERENCE if valid, or throws an IOException otherwise
+     * @throws IOException If an invalid variable name is encountered
+     */
+    TokenType handleNCNameorQNameorFunctionNameorAxisNameorKeyword() throws IOException {
+        TrieNode node = keywordTrie.getRoot();
+        node = keywordTrie.traverse(forwardBuffer[forward], node); // Traverse the first letter
+        int colonCount = 0;
+        while (true) {
+            readNextChar();
+            byte currentByte = forwardBuffer[forward];
+
+
+
+            if (isLetter(currentByte) || currentByte == MINUS || currentByte == FULL_STOP || isDigit(currentByte) || currentByte == COLON || currentByte == UNDERSCORE || currentByte == EQUALS || currentByte == GREATER_THAN || currentByte == LESS_THAN) {
+                // Continue traversing if it's a letter or could be an identifier
+                if(currentByte == COLON) {
+                    readNextChar();
+                    if(forwardBuffer[forward] == COLON) { // Needs to be done so as to nto confuse an axis seperator with QName
+                        decrementForward();
+                        break;
+                    }
+                    decrementForward();
+                    colonCount++;
+                }
+                if (node != null) {
+                    node = keywordTrie.traverse(currentByte, node);
+                }
+
+            } else {
+                // Not a letter or valid hyphen sequence, end of potential identifier/keyword
+                break;
+            }
+        }
+        decrementForward(); // Backtrack to the last token
+        if(colonCount>1) {
+            throw new IOException("Invalid Identifier");
+        }
+        if(node != null && node.isKeyword) {
+            return node.tokenType;
+        }
+        return colonCount==1?TokenType.QName:TokenType.NCName; // Matched prefix or not a keyword
     }
 
     /**

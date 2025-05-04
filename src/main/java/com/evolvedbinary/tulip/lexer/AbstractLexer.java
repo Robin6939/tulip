@@ -16,11 +16,14 @@ package com.evolvedbinary.tulip.lexer;
 
 import com.evolvedbinary.tulip.source.Source;
 import com.evolvedbinary.tulip.spec.XmlSpecification;
+import com.evolvedbinary.tulip.trie.Trie;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
+import java.util.List;
 
 import static com.evolvedbinary.tulip.constants.LexerConstants.BUFFER_SIZE;
 
@@ -294,6 +297,214 @@ abstract class AbstractLexer implements Lexer {
      */
     public String getCurrentLexeme() {
         return new String(getCurrentLexemeBytes());
+    }
+
+    /**
+     * Builds and populates the Trie with XPath 1.0 keywords.
+     *
+     * @return The populated Trie.
+     */
+    public static Trie buildKeywordTrie() {
+        Trie trie = new Trie();
+
+        // --- Identifier Names ---
+        List<String> identifier = Arrays.asList(
+                "=>", "eq", "ne", "lt",
+                "le", "gt", "ge",
+                "is", "<<", ">>",
+                ":="
+        );
+        for (String axis : identifier) {
+            trie.insert(axis, TokenType.IDENTIFIER);
+        }
+
+        // --- Operator Names ---
+        trie.insert("=>", TokenType.ARROW);
+        trie.insert("<<", TokenType.NODE_BEFORE);
+        trie.insert(">>", TokenType.NODE_AFTER);
+        trie.insert(":=", TokenType.NAMESPACE_SEPARATOR);
+
+
+        // --- Axis Names ---
+        List<String> axisNames = Arrays.asList(
+                "ancestor", "ancestor-or-self", "attribute", "child",
+                "descendant", "descendant-or-self", "following",
+                "following-sibling", "namespace", "parent",
+                "preceding", "preceding-sibling", "self"
+        );
+        for (String axis : axisNames) {
+            trie.insert(axis, TokenType.AXIS_NAME);
+        }
+
+        // --- Function Names ---
+        List<String> functionNames = Arrays.asList(
+                // Node set functions
+                "last", "position", "count", "id", "local-name",
+                "namespace-uri", "name",
+                // String functions
+                "string", "concat", "starts-with", "contains",
+                "substring-before", "substring-after", "substring",
+                "string-length", "normalize-space", "translate",
+                // Boolean functions
+                "boolean", "not", "true", "false", "lang",
+                // Number functions
+                "number", "sum", "floor", "ceiling", "round",
+                // Node Test Functions
+                "node", "text", "comment", "processing-instruction"
+        );
+        for (String function : functionNames) {
+            trie.insert(function, TokenType.FUNCTION);
+        }
+
+        // --- Arithmetic Operator Names ---
+        trie.insert("and", TokenType.AND);
+        trie.insert("or", TokenType.OR);
+        trie.insert("div", TokenType.DIV);
+        trie.insert("mod", TokenType.MOD);
+
+        // --- XPath 2.0 Keywords ---
+        trie.insert("instance", TokenType.INSTANCE_OF);
+        trie.insert("castable", TokenType.CASTABLE);
+        trie.insert("of", TokenType.OF);
+        trie.insert("cast", TokenType.CAST);
+        trie.insert("as", TokenType.AS);
+        trie.insert("treat", TokenType.TREAT);
+        trie.insert("return", TokenType.RETURN);
+        trie.insert("for", TokenType.FOR);
+        trie.insert("in", TokenType.IN);
+        trie.insert("some", TokenType.SOME);
+        trie.insert("every", TokenType.EVERY);
+        trie.insert("if", TokenType.IF);
+        trie.insert("then", TokenType.THEN);
+        trie.insert("else", TokenType.ELSE);
+        trie.insert("typeswitch", TokenType.TYPESWITCH);
+        trie.insert("case", TokenType.CASE);
+        trie.insert("default", TokenType.DEFAULT);
+        trie.insert("at", TokenType.AT);
+        trie.insert("where", TokenType.WHERE);
+        trie.insert("order", TokenType.ORDER);
+        trie.insert("by", TokenType.BY);
+        trie.insert("ascending", TokenType.ASCENDING);
+        trie.insert("descending", TokenType.DESCENDING);
+        trie.insert("stable", TokenType.STABLE);
+        trie.insert("union", TokenType.UNION);
+        trie.insert("intersect", TokenType.INTERSECT);
+        trie.insert("except", TokenType.EXCEPT);
+        trie.insert("to", TokenType.TO);
+        trie.insert("satisfies", TokenType.SATISFIES);
+        trie.insert("collation", TokenType.COLLATION);
+        trie.insert("import", TokenType.IMPORT);
+        trie.insert("schema", TokenType.SCHEMA);
+        trie.insert("module", TokenType.MODULE);
+        trie.insert("preserve", TokenType.PRESERVE);
+        trie.insert("strip", TokenType.STRIP);
+        trie.insert("copy-of", TokenType.COPY_OF);
+        trie.insert("deep-equal", TokenType.DEEP_EQUAL);
+        trie.insert("exactly-one", TokenType.EXACTLY_ONE);
+        trie.insert("zero-or-one", TokenType.ZERO_OR_ONE);
+        trie.insert("one-or-more", TokenType.ONE_OR_MORE);
+
+        // System.out.println("Trie has been created and populated"); // Keep commented out or remove for production
+        return trie;
+    }
+
+    /**
+     * Handles single and multi-character operators and punctuation.
+     *
+     * @param firstByte The first byte of the potential operator/punctuation.
+     * @return The corresponding TokenType.
+     * @throws IOException If an I/O error occurs or an invalid sequence is found (e.g., '!' not followed by '=').
+     */
+    public TokenType handleOperatorOrPunctuation(final byte firstByte) throws IOException {
+        switch (firstByte) {
+            case SLASH:
+                readNextChar();
+                if (forwardBuffer[forward] == SLASH) {
+                    return TokenType.DOUBLE_SLASH; // '//'
+                } else {
+                    decrementForward(); // Backtrack, it's just '/'
+                    return TokenType.SLASH;
+                }
+            case PLUS:
+                return TokenType.PLUS;
+            case MINUS:
+                return TokenType.MINUS;
+            case MULTIPLY_OPERATOR:
+                return TokenType.MULTIPLY_OPERATOR;
+            case EQUALS:
+                readNextChar();
+                if(forwardBuffer[forward] == GREATER_THAN) {
+                    return TokenType.ARROW;
+                }
+                decrementForward();
+                return TokenType.EQUAL_TO;
+            case LPAREN:
+                return TokenType.LPAREN;
+            case RPAREN:
+                return TokenType.RPAREN;
+            case LBRACKET:
+                return TokenType.LBRACKET;
+            case RBRACKET:
+                return TokenType.RBRACKET;
+            case AT_OPERATOR:
+                return TokenType.AT_OPERATOR;
+            case COMMA:
+                return TokenType.COMMA;
+            case UNION_OPERATOR:
+                readNextChar();
+                if(forwardBuffer[forward] == UNION_OPERATOR) {
+                    return TokenType.CONCAT_OPERATOR;
+                }
+                decrementForward();
+                return TokenType.UNION_OPERATOR;
+            case LBRACE:
+                return TokenType.OPEN_BRACE;
+            case RBRACE:
+                return TokenType.CLOSE_BRACE;
+            case SEMICOLON:
+                return TokenType.SEMICOLON;
+            case NOT:
+                readNextChar();
+                if (forwardBuffer[forward] == EQUALS) {
+                    return TokenType.NOT_EQUAL_TO; // '!='
+                } else {
+                    throw new IOException("Invalid character sequence: '!' must be followed by '=' in XPath 1.0 for '!=' operator.");
+                }
+            case GREATER_THAN:
+                readNextChar();
+                if (forwardBuffer[forward] == EQUALS) {
+                    return TokenType.GREATER_THAN_EQUAL_TO; // '>='
+                } else if(forwardBuffer[forward] == GREATER_THAN) {
+                    return TokenType.NODE_AFTER;
+                } else {
+                    decrementForward(); // Backtrack, it's just '>'
+                    return TokenType.GREATER_THAN;
+                }
+            case LESS_THAN:
+                readNextChar();
+                if (forwardBuffer[forward] == EQUALS) {
+                    return TokenType.LESS_THAN_EQUAL_TO; // '<='
+                } else if(forwardBuffer[forward] == LESS_THAN) {
+                    return TokenType.NODE_BEFORE;
+                } else {
+                    decrementForward(); // Backtrack, it's just '<'
+                    return TokenType.LESS_THAN;
+                }
+            case COLON:
+                readNextChar();
+                if (forwardBuffer[forward] == COLON) {
+                    return TokenType.AXIS_SEPARATOR; // '::'
+                } else if(forwardBuffer[forward] == EQUALS) {
+                    return TokenType.NAMESPACE_SEPARATOR;
+                } else {
+                    // Backtrack and return forward
+                    decrementForward();
+                    return TokenType.COLON;
+                }
+            default:
+                // If none of the known characters match, it's an unexpected character.
+                throw new IOException("Unexpected character encountered: " + (char) firstByte + " (byte value: " + firstByte + ")");
+        }
     }
 
 
