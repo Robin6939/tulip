@@ -18,58 +18,7 @@ import java.util.List;
 public class XPath10Lexer extends AbstractLexer {
 
     // Trie for efficient keyword lookup (Axis Names and Function Names)
-    private static final Trie keywordTrie = buildKeywordTrie();
-
-    /**
-     * Builds and populates the Trie with XPath 1.0 keywords.
-     *
-     * @return The populated Trie.
-     */
-    private static Trie buildKeywordTrie() {
-        Trie trie = new Trie();
-
-        // --- Axis Names ---
-        List<String> axisNames = Arrays.asList(
-                "ancestor", "ancestor-or-self", "attribute", "child",
-                "descendant", "descendant-or-self", "following",
-                "following-sibling", "namespace", "parent",
-                "preceding", "preceding-sibling", "self"
-        );
-        for (String axis : axisNames) {
-            trie.insert(axis, false, true);
-        }
-
-        // --- Function Names ---
-        List<String> functionNames = Arrays.asList(
-                // Node set functions
-                "last", "position", "count", "id", "local-name",
-                "namespace-uri", "name",
-                // String functions
-                "string", "concat", "starts-with", "contains",
-                "substring-before", "substring-after", "substring",
-                "string-length", "normalize-space", "translate",
-                // Boolean functions
-                "boolean", "not", "true", "false", "lang",
-                // Number functions
-                "number", "sum", "floor", "ceiling", "round",
-                // Node Test Functions
-                "node", "text", "comment", "processing-instruction"
-        );
-        for (String function : functionNames) {
-            trie.insert(function, true, false);
-        }
-
-        // --- Arithmetic Operator Names ---
-        List<String> arithmeticOperatorNames = Arrays.asList(
-                "and", "or", "div", "mod"
-        );
-        for (String op : arithmeticOperatorNames) {
-            trie.insert(op, false, false);
-        }
-
-        // System.out.println("Trie has been created and populated"); // Keep commented out or remove for production
-        return trie;
-    }
+    static final Trie keywordTrie = buildKeywordTrie();
 
     /**
      * Constructs an XPath10Lexer.
@@ -103,14 +52,19 @@ public class XPath10Lexer extends AbstractLexer {
         } else if (isLetter(firstByte)) {
             tokenType = handleIdentifierOrKeyword();
         } else if (firstByte == UNDERSCORE) {
-            tokenType = handleIdentifierStartingWithUnderscore();
+            readNextChar();
+            if(isLetter(forwardBuffer[forward])) {
+                tokenType = handleIdentifierOrKeyword();
+            } else {
+                throw new IOException("Not a valid lexeme starting with underscore");
+            }
         } else if (isDigit(firstByte)) {
             tokenType = handleNumberStartingWithDigit();
         } else if (firstByte == FULL_STOP) {
             tokenType = handleDotOrNumberStartingWithDot();
         } else if(firstByte == MINUS) {
             tokenType = handleNegativeNumbers();
-        }else if (firstByte == QUOTATION_MARK || firstByte == APOSTROPHE) {
+        } else if (firstByte == QUOTATION_MARK || firstByte == APOSTROPHE) {
             tokenType = handleLiteral(firstByte);
         } else {
             // Handle operators and punctuation
@@ -176,39 +130,9 @@ public class XPath10Lexer extends AbstractLexer {
         }
         decrementForward(); // Backtrack to the last token
         // Determine token type based on final Trie node state
-        if (node != null && node.isFunction) {
-            return TokenType.FUNCTION;
-        } else if(node != null && node.isAxis) {
-            return TokenType.AXIS_NAME;
-        } else if(node != null && node.isKeyword) {
-            if(beginBuffer[lexemeBegin] == 0x61) {
-                return TokenType.AND;
-            } else if(beginBuffer[lexemeBegin] == 0x6F) {
-                return TokenType.OR;
-            } else if(beginBuffer[lexemeBegin] == 0x64) {
-                return TokenType.DIV;
-            } else {
-                return TokenType.MOD;
-            }
-        } else {
-            return TokenType.IDENTIFIER; // Matched prefix or not a keyword
-        }
-    }
-
-    /**
-     * Handles tokens starting with a underscore, which could be an identifier,
-     * calls upon handleIdentifierOrKeyword() after reading underscore
-     *
-     * @return The determined TokenType (IDENTIFIER, AXIS_NAME, or FUNCTION, or Arithmetic Keyword).
-     * @throws IOException If an I/O error occurs.
-     */
-    private TokenType handleIdentifierStartingWithUnderscore() throws IOException {
-        readNextChar();
-        if (isLetter(forwardBuffer[forward])) {
-            return handleIdentifierOrKeyword();
-        } else {
-            throw new IOException("Underscore should be followed by a letter for it to be identified as a proper identifier in XPath 1.0");
-        }
+        if(node!=null && node.isKeyword)
+            return node.tokenType;
+        return TokenType.IDENTIFIER;
     }
 
     /**
@@ -217,7 +141,7 @@ public class XPath10Lexer extends AbstractLexer {
      * @return TokenType.DIGITS (representing a number literal).
      * @throws IOException If an I/O error occurs.
      */
-    private TokenType handleNumberStartingWithDigit() throws IOException {
+    TokenType handleNumberStartingWithDigit() throws IOException {
         TokenType tokenType = TokenType.DIGITS;
         // Consume initial sequence of digits
         do {
@@ -288,7 +212,7 @@ public class XPath10Lexer extends AbstractLexer {
      * @return TokenType.LITERAL.
      * @throws IOException If an I/O error occurs or the closing quote is not found.
      */
-    private TokenType handleLiteral(final byte quoteByte) throws IOException {
+    public TokenType handleLiteral(final byte quoteByte) throws IOException {
         do {
             readNextChar();
             // Check for EOF before finding the closing quote
@@ -298,84 +222,6 @@ public class XPath10Lexer extends AbstractLexer {
         } while (forwardBuffer[forward] != quoteByte);
         return TokenType.LITERAL;
     }
-
-    /**
-     * Handles single and multi-character operators and punctuation.
-     *
-     * @param firstByte The first byte of the potential operator/punctuation.
-     * @return The corresponding TokenType.
-     * @throws IOException If an I/O error occurs or an invalid sequence is found (e.g., '!' not followed by '=').
-     */
-    private TokenType handleOperatorOrPunctuation(final byte firstByte) throws IOException {
-        switch (firstByte) {
-            case SLASH:
-                readNextChar();
-                if (forwardBuffer[forward] == SLASH) {
-                    return TokenType.DOUBLE_SLASH; // '//'
-                } else {
-                    decrementForward(); // Backtrack, it's just '/'
-                    return TokenType.SLASH;
-                }
-            case PLUS:
-                return TokenType.PLUS;
-            case MINUS:
-                return TokenType.MINUS;
-            case MULTIPLY_OPERATOR:
-                return TokenType.MULTIPLY_OPERATOR;
-            case EQUALS:
-                return TokenType.EQUAL_TO;
-            case LPAREN:
-                return TokenType.LPAREN;
-            case RPAREN:
-                return TokenType.RPAREN;
-            case LBRACKET:
-                return TokenType.LBRACKET;
-            case RBRACKET:
-                return TokenType.RBRACKET;
-            case AT_OPERATOR:
-                return TokenType.AT_OPERATOR;
-            case COMMA:
-                return TokenType.COMMA;
-            case UNION_OPERATOR:
-                return TokenType.UNION_OPERATOR;
-            case NOT:
-                readNextChar();
-                if (forwardBuffer[forward] == EQUALS) {
-                    return TokenType.NOT_EQUAL_TO; // '!='
-                } else {
-                    throw new IOException("Invalid character sequence: '!' must be followed by '=' in XPath 1.0 for '!=' operator.");
-                }
-            case GREATER_THAN:
-                readNextChar();
-                if (forwardBuffer[forward] == EQUALS) {
-                    return TokenType.GREATER_THAN_EQUAL_TO; // '>='
-                } else {
-                    decrementForward(); // Backtrack, it's just '>'
-                    return TokenType.GREATER_THAN;
-                }
-            case LESS_THAN:
-                readNextChar();
-                if (forwardBuffer[forward] == EQUALS) {
-                    return TokenType.LESS_THAN_EQUAL_TO; // '<='
-                } else {
-                    decrementForward(); // Backtrack, it's just '<'
-                    return TokenType.LESS_THAN;
-                }
-            case COLON:
-                readNextChar();
-                if (forwardBuffer[forward] == COLON) {
-                    return TokenType.AXIS_SEPARATOR; // '::'
-                } else {
-                    // Backtrack and return forward
-                    decrementForward();
-                    return TokenType.COLON;
-                }
-            default:
-                // If none of the known characters match, it's an unexpected character.
-                throw new IOException("Unexpected character encountered: " + (char) firstByte + " (byte value: " + firstByte + ")");
-        }
-    }
-
 
     /**
      * Checks if a byte represents an ASCII digit ('0'-'9').
